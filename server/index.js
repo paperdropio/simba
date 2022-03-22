@@ -2,19 +2,19 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const formRouter = require('./src/routes/forms.route.js');
+const submissionRouter = require('./src/routes/submission.route.js');
 const {MongoClient} = require("mongodb");
+const db = require('./src/configs/db.config');
 
-//Initialize dotenv
-require('dotenv').config();
-
-const client = new MongoClient(process.env.DB_CONN_STR);
+const client = new MongoClient(db.connectionString);
 
 //Init db connection here and add the db object to the global variable
 //so it can be shared with other routes
 async function init() {
-    const db = await client.connect();
+     await client.connect();
+     const dbObj = await client.db(db.DB_NAME);
     //share the connection globally 
-    global.db = db;
+    global.db = dbObj;
 }
 
 //init 
@@ -38,6 +38,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/forms', formRouter);
+app.use('/submission', submissionRouter);
 
 /* Error handler middleware */
 app.use((err, req, res, next) => {

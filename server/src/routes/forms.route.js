@@ -1,13 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const formController = require('../controllers/forms.controller');
-const createFormMiddleware = require('../middleware/createForm-middleware')
+const formValidationMiddleware = require('../middleware/form-validation-middleware')
 
 
-/* GET programming languages. */
 router.get('/', formController.get);
-  
-/* POST programming language */
-router.post('/create', createFormMiddleware.createForm, formController.create);
+router.post('/create', formValidationMiddleware.createForm, formController.createForm);
+router.post('/save', formValidationMiddleware.saveForm, formController.saveForm);
+router.post('/publish', formController.publishForm);
 
 module.exports = router;
