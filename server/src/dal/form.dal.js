@@ -1,12 +1,14 @@
 const { ObjectId } = require("mongodb");
 const Form = require("../models/form.model");
 const moment = require('moment');
+const _ = require('lodash');
+const {v4:uuid} = require("uuid")
 
 async function createForm(formModel) {
     let dbo = global.db;
 
     formModel._id = ObjectId();
-    const result = await dbo.collection("forms").insertOne(formModel);
+     const result = await dbo.collection("forms").insertOne(formModel);
 
     return { success: result.acknowledged, insertedId: result.insertedId };
 }
@@ -18,18 +20,22 @@ async function publishForm(formId) {
 
     const result = false;
     if ( form) {
-        if ( form.fields.length > 0) {
-            const result = await dbo.collection("forms").updateOne({ _id: form.Id }, { $set: {  published: true, 
-                                                                                        publishedDate: moment().utc().toISOString() 
-                                                                                    }}, {upsert: false});
-            
-            return { success: result.acknowledged && result.matchedCount == 1, totalModified: result.modifiedCount };
-        } else {
-            return { success: false, message: 'Form not complete' };
-        }
-    }
+        const publishSecret = uuid();
 
-    return { success: false, totalModified: 0 };
+        const result = await dbo.collection("forms").updateOne({ _id: form.Id }, 
+            { $set: {  
+                published: true, 
+                publishedDate: moment().utc().toISOString(), 
+                publishSecrets: { secret: publishSecret }
+            }}, { upsert: false });
+            
+        return { success: result.acknowledged && result.matchedCount == 1, 
+                 totalModified: result.modifiedCount, 
+                 publishSecret: publishSecret 
+                };
+    } else {
+        return { success: false, message: 'Form not complete' };
+    }
 }
 
 async function saveForm(formModel) {
@@ -46,10 +52,17 @@ async function getForm(formId) {
     let result = await dbo.collection("forms").findOne({ _id: ObjectId(formId) });
 
     if (result) {
-        return new Form(result, result._id);
+        let form = new Form(result, result._id);
+        form = sanitizeForm(form);
+
+        return form;
     }
 
     return null;
+}
+
+const sanitizeForm = (form) => {
+    return _.omit(form, ['publishSecrets']);
 }
 
 module.exports = {

@@ -1,33 +1,15 @@
-const { getForm, createForm, saveForm, publishForm } = require('../dal/form.dal');
+const { submitForm } = require('../dal/submission.dal');
+const moment = require('moment');
+var httpContext = require('express-http-context');
 
-
-function get(formId) {
-    const result = getForm(formId);
+function saveSubmission(formSubmission) {
+    formSubmission.submittedOn = moment().utc().format();
+    formSubmission.requestId = httpContext.get('requestId');
+    const result = submitForm(formSubmission);
     
     return result;
 }
 
-async function create(model) {
-    const result = await createForm(model);
-
-    return result;
-}
-
-async function publish(formId) {
-    const result = await publishForm(formId);
-
-    return result;
-}
-
-async function save(model) {
-    const result = await saveForm(model);
-
-    return result;
-}
-
 module.exports = {
-    get,
-    create,
-    save,
-    publish
+    saveSubmission
 }

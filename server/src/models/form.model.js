@@ -15,7 +15,9 @@ class Form {
         this.invalidValueMessage = model.invalidValueMessage;
         this.fields = [];
         this.published = model.published;
-
+        this.lastSavedOn = model.lastSavedOn;
+        this.publishSecrets = new FormPublishSecrets(model.publishSecrets);
+        
         if ( model.fields && _.isArray(model.fields)){
             _.forEach(model.fields, (d) => {
                 this.fields.push(new FormField(d));
@@ -39,8 +41,8 @@ class FormFieldDataType {
         this.required = model.required;
         this.dataTypeAttribute = [];
 
-        if ( model.dataTypeAttributes && _.isArray(model.dataTypeAttributes)){
-            _.forEach(model.dataTypeAttributes, (d) => {
+        if ( model.dataTypeAttribute && _.isArray(model.dataTypeAttribute)){
+            _.forEach(model.dataTypeAttribute, (d) => {
                 this.dataTypeAttribute.push(new FormFieldDataTypeAttribute(d));
             });
         }
@@ -51,6 +53,14 @@ class FormFieldDataTypeAttribute {
     constructor(model) {
         this.attribute = model.attribute;
         this.attributeValue = model.attributeValue;
+    }
+}
+
+class FormPublishSecrets {
+    constructor(model) {
+        if (model){
+            this.secret = model.secret;
+        }
     }
 }
 

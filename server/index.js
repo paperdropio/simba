@@ -5,6 +5,7 @@ const formRouter = require('./src/routes/forms.route.js');
 const submissionRouter = require('./src/routes/submission.route.js');
 const {MongoClient} = require("mongodb");
 const db = require('./src/configs/db.config');
+var httpContext = require('express-http-context');
 
 const client = new MongoClient(db.connectionString);
 
@@ -26,8 +27,8 @@ console.log("Initializing server");
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(httpContext.middleware);
 app.use(cors());
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true,

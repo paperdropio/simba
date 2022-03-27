@@ -2,12 +2,16 @@ const db = require("../configs/db.config");
 const formService = require("../services/forms.services");
 const Form = require('../models/form.model');
 const GeneralResult = require('../models/generalResult.model');
+var httpContext = require('express-http-context');
+const { v4: uuid } = require('uuid');
+
 
 async function get(req, res, next) {
   try {
     const result = await formService.get(req.query.id);
 
     if (result) {
+      httpContext.set('uRequestId', uuid());
       res.json(new GeneralResult(true, result));
     }
     else {
@@ -33,6 +37,7 @@ async function createForm(req, res, next) {
 async function saveForm(req, res, next) {
   try {
     const model = new Form(req.body);
+    
     const result = await formService.save(model);
 
     res.json(new GeneralResult(result.success, result.totalModified));
@@ -47,7 +52,7 @@ async function publishForm(req, res, next) {
     const id = req.body.id;
     const result = await formService.publish(id);
 
-    res.json(new GeneralResult(result.success, result.totalModified, result.message));
+    res.json(new GeneralResult(result.success, result.publishSecret, result.message));
   } catch (err) {
     console.error(`Caught exception`, err.message);
     next(err);
