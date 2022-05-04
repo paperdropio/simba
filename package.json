@@ -1,0 +1,22 @@
+{
+  "name": "simba",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/paperdropio/simba.git",
+  "author": "Deepak Sharma <sharma.deepak83@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "start": "yarn workspaces foreach -pi run start",
+    "build": "yarn workspaces foreach -pti run build",
+    "start:server": "yarn workspace simba-server run start",
+    "start:client": "yarn workspace simba-client run start",
+    "start:shared": "yarn workspace simba-shared run start"
+  },
+  "packageManager": "yarn@3.0.0"
+}
